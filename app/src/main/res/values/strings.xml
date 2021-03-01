@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">geekbrains_my_app_weather</string>
+    <string name="test_class">data class</string>
+    <string name="text_enter">введите текст</string>
 </resources>
