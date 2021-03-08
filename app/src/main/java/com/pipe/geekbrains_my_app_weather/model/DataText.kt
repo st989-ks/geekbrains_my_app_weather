@@ -1,4 +1,4 @@
-package com.pipe.geekbrains_my_app_weather
+package com.pipe.geekbrains_my_app_weather.model
 
 class DataText
 const val TAG_FIRST = "TAG_FIRST"
