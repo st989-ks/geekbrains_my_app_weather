@@ -1,4 +1,4 @@
-package com.pipe.geekbrains_my_app_weather.view
+package com.pipe.geekbrains_my_app_weather.view.main
 
 import android.view.LayoutInflater
 import android.view.View

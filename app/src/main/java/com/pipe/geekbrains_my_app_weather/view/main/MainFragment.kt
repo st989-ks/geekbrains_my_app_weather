@@ -1,4 +1,4 @@
-package com.pipe.geekbrains_my_app_weather.view
+package com.pipe.geekbrains_my_app_weather.view.main
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,6 +11,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.pipe.geekbrains_my_app_weather.R
 import com.pipe.geekbrains_my_app_weather.databinding.FragmentMainBinding
 import com.pipe.geekbrains_my_app_weather.model.Weather
+import com.pipe.geekbrains_my_app_weather.view.details.WeatherFragment
 import com.pipe.geekbrains_my_app_weather.viewmodel.AppState
 import com.pipe.geekbrains_my_app_weather.viewmodel.MainViewModel
 
@@ -21,22 +22,29 @@ class MainFragment : Fragment() {
     private lateinit var viewModel: MainViewModel
     private var isDataSetRus: Boolean = true
 
-    private val adapter = RecyclerViewAdapter(object : OnItemViewClickListener {
-        override fun onItemViewClick(weather: Weather) {
-            val manager = activity?.supportFragmentManager
-            if (manager != null) {
-                val bundle = Bundle()
-                bundle.putParcelable(WeatherFragment.BUNDLE_EXTRA, weather)
-                manager.beginTransaction()
-                    .add(R.id.container, WeatherFragment.newInstance(bundle))
-                    .addToBackStack("")
-                    .commitAllowingStateLoss()
+    private val adapter =
+        RecyclerViewAdapter(object :
+            OnItemViewClickListener {
+            override fun onItemViewClick(weather: Weather) {
+                val manager = activity?.supportFragmentManager
+                if (manager != null) {
+                    val bundle = Bundle()
+                    bundle.putParcelable(WeatherFragment.BUNDLE_EXTRA, weather)
+                    manager.beginTransaction()
+                        .add(R.id.container,
+                            WeatherFragment.newInstance(
+                                bundle
+                            )
+                        )
+                        .addToBackStack("")
+                        .commitAllowingStateLoss()
+                }
             }
-        }
-    })
+        })
 
     companion object {
-        fun newInstance() = MainFragment()
+        fun newInstance() =
+            MainFragment()
     }
 
     override fun onCreateView(
