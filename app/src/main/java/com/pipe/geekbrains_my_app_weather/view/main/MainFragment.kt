@@ -26,16 +26,11 @@ class MainFragment : Fragment() {
         RecyclerViewAdapter(object :
             OnItemViewClickListener {
             override fun onItemViewClick(weather: Weather) {
-                val manager = activity?.supportFragmentManager
-                if (manager != null) {
-                    val bundle = Bundle()
-                    bundle.putParcelable(WeatherFragment.BUNDLE_EXTRA, weather)
-                    manager.beginTransaction()
-                        .add(R.id.container,
-                            WeatherFragment.newInstance(
-                                bundle
-                            )
-                        )
+                activity?.supportFragmentManager?.apply {
+                    beginTransaction()
+                        .add(R.id.container, WeatherFragment.newInstance(Bundle().apply {
+                            putParcelable(WeatherFragment.BUNDLE_EXTRA, weather)
+                        }))
                         .addToBackStack("")
                         .commitAllowingStateLoss()
                 }
@@ -100,6 +95,11 @@ class MainFragment : Fragment() {
     override fun onDestroy() {
         adapter.removeListener()
         super.onDestroy()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     interface OnItemViewClickListener {
