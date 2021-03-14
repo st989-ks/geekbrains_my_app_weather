@@ -7,10 +7,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.pipe.geekbrains_my_app_weather.R
 import com.pipe.geekbrains_my_app_weather.model.Weather
+import com.pipe.geekbrains_my_app_weather.view.main.MainFragment.OnItemViewClickListener
 
 class RecyclerViewAdapter(private var onItemViewClickListener:
-                          MainFragment.OnItemViewClickListener?)
-    : RecyclerView.Adapter<RecyclerViewAdapter.MainViewHolder>() {
+                          OnItemViewClickListener?) :
+    RecyclerView.Adapter<RecyclerViewAdapter.MainViewHolder>() {
 
     private var weatherData: List<Weather> = listOf()
 
@@ -23,10 +24,13 @@ class RecyclerViewAdapter(private var onItemViewClickListener:
         onItemViewClickListener = null
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): MainViewHolder {
         return MainViewHolder(
                 LayoutInflater.from(parent.context)
-                        .inflate(R.layout.recycler_fragment, parent, false) as View
+                        .inflate(R.layout.fragment_recycler, parent, false) as View
         )
     }
 
@@ -41,10 +45,12 @@ class RecyclerViewAdapter(private var onItemViewClickListener:
     inner class MainViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         fun bind(weather: Weather) {
-            itemView.findViewById<TextView>(R.id.text_fragment).text =
+            itemView.apply {
+                findViewById<TextView>(R.id.text_fragment_recycler).text =
                     weather.city.city
-            itemView.setOnClickListener {
-                onItemViewClickListener?.onItemViewClick(weather)
+                setOnClickListener {
+                    onItemViewClickListener?.onItemViewClick(weather)
+                }
             }
         }
     }
