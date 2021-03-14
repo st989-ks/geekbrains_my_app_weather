@@ -9,8 +9,10 @@ import com.pipe.geekbrains_my_app_weather.R
 import com.pipe.geekbrains_my_app_weather.model.Weather
 import com.pipe.geekbrains_my_app_weather.view.main.MainFragment.OnItemViewClickListener
 
-class RecyclerViewAdapter(private var onItemViewClickListener:
-                          OnItemViewClickListener?) :
+class RecyclerViewAdapter(
+    private var onItemViewClickListener:
+    OnItemViewClickListener?
+) :
     RecyclerView.Adapter<RecyclerViewAdapter.MainViewHolder>() {
 
     private var weatherData: List<Weather> = listOf()
@@ -29,8 +31,8 @@ class RecyclerViewAdapter(private var onItemViewClickListener:
         viewType: Int
     ): MainViewHolder {
         return MainViewHolder(
-                LayoutInflater.from(parent.context)
-                        .inflate(R.layout.fragment_recycler, parent, false) as View
+            LayoutInflater.from(parent.context)
+                .inflate(R.layout.fragment_recycler, parent, false) as View
         )
     }
 

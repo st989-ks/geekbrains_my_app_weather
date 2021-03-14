@@ -6,27 +6,18 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.google.gson.Gson
-import com.pipe.geekbrains_my_app_weather.BuildConfig
 import com.pipe.geekbrains_my_app_weather.R
 import com.pipe.geekbrains_my_app_weather.databinding.FragmentDetailsBinding
 import com.pipe.geekbrains_my_app_weather.model.FactDTO
 import com.pipe.geekbrains_my_app_weather.model.Weather
 import com.pipe.geekbrains_my_app_weather.model.WeatherDTO
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.net.MalformedURLException
-import java.net.URL
-import java.util.stream.Collectors
-import javax.net.ssl.HttpsURLConnection
+import com.pipe.geekbrains_my_app_weather.model.WeatherLoader
 
 const val DETAILS_INTENT_FILTER = "DETAILS INTENT FILTER"
 const val DETAILS_LOAD_RESULT_EXTRA = "LOAD RESULT"
@@ -49,6 +40,17 @@ class WeatherFragment : Fragment() {
     private var _binding: FragmentDetailsBinding? = null
     private val binding get() = _binding!!
     private lateinit var weatherBundle: Weather
+    private val onLoadListener: WeatherLoader.WeatherLoaderListener =
+        object : WeatherLoader.WeatherLoaderListener {
+            override fun onLoaded(weatherDTO: WeatherDTO) {
+                displayWeather(weatherDTO)
+            }
+
+            override fun onFailed(throwable: Throwable) {
+                //Обработка ошибки
+            }
+        }
+
     private val loadResultsReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.getStringExtra(DETAILS_LOAD_RESULT_EXTRA)) {
@@ -98,7 +100,8 @@ class WeatherFragment : Fragment() {
         weatherBundle = arguments?.getParcelable(BUNDLE_EXTRA) ?: Weather()
         binding.mainView.visibility = View.GONE
         binding.loadingLayout.visibility = View.VISIBLE
-        loadWeather()
+        val loader = WeatherLoader(onLoadListener, weatherBundle.city.lat, weatherBundle.city.lon)
+        loader.loadWeather()
     }
 
     companion object {
@@ -158,51 +161,4 @@ class WeatherFragment : Fragment() {
         }
         super.onDestroy()
     }
-
-    @RequiresApi(Build.VERSION_CODES.N)
-    private fun loadWeather() {
-        try {
-            val uri =
-                URL(
-                    "https://api.weather.yandex.ru/v2/informers?lat=" +
-                            "${weatherBundle.city.lat}&lon=${weatherBundle.city.lon}"
-                )
-            val handler = Handler()
-            Thread(Runnable {
-                lateinit var urlConnection: HttpsURLConnection
-                try {
-                    urlConnection = uri.openConnection() as HttpsURLConnection
-                    urlConnection.requestMethod = "GET"
-                    urlConnection.addRequestProperty(
-                        "X-Yandex-API-Key",
-                        BuildConfig.WEATHER_API_KEY
-                    )
-                    urlConnection.readTimeout = 5000
-                    val bufferedReader =
-                        BufferedReader(InputStreamReader(urlConnection.inputStream))
-
-                    // преобразование ответа от сервера (JSON) в модель данных (WeatherDTO)
-                    val weatherDTO: WeatherDTO =
-                        Gson().fromJson(getLines(bufferedReader), WeatherDTO::class.java)
-                    handler.post { displayWeather(weatherDTO) }
-                } catch (e: Exception) {
-                    Log.e("", "Fail connection", e)
-                    e.printStackTrace()
-                    //Обработка ошибки
-                } finally {
-                    urlConnection.disconnect()
-                }
-            }).start()
-        } catch (e: MalformedURLException) {
-            Log.e("", "Fail URI", e)
-            e.printStackTrace()
-            //Обработка ошибки
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.N)
-    private fun getLines(reader: BufferedReader): String {
-        return reader.lines().collect(Collectors.joining("\n"))
-    }
-
 }
